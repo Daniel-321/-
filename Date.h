@@ -1,18 +1,19 @@
-//
-// Created by 13704 on 2019/7/17.
-//
+#ifndef DATE_H_INCLUDED
+#define DATE_H_INCLUDED
 
-#ifndef WANNIANLI_DATE_H
-#define WANNIANLI_DATE_H
-
+//
+// Created by yyh on 2019/7/17.
+//
+#include <iomanip>
+#include<stdlib.h>
 #include <iostream>
-//DateÀà²»ĞèÒª¿½±´¹¹Ôìº¯Êı£¬ÒòÎª¶ÔÓÚÈÎÒâÁ½¸öÈÕÆÚ ËûÃÇ×ÜÊÇ²»Ò»ÑùµÄ
+//Dateç±»ä¸éœ€è¦æ‹·è´æ„é€ å‡½æ•°ï¼Œå› ä¸ºå¯¹äºä»»æ„ä¸¤ä¸ªæ—¥æœŸ ä»–ä»¬æ€»æ˜¯ä¸ä¸€æ ·çš„
 #define DISALLOW_COPY_AND_ASSIGN(TypeName) \
   TypeName(const TypeName&);               \
   void operator=(const TypeName&)
 /*
- 1.µ÷ÓÃÏµÍ³Ê±¼ä£¬Êä³öµ±Ç°ÔÂµÄÈÕÀú
- 2.Ö¸¶¨Ä³ÄêÄ³ÔÂ Êä³ö¸ÃÔÂµÄÈÕÀú
+ 1.è°ƒç”¨ç³»ç»Ÿæ—¶é—´ï¼Œè¾“å‡ºå½“å‰æœˆçš„æ—¥å†
+ 2.æŒ‡å®šæŸå¹´æŸæœˆ è¾“å‡ºè¯¥æœˆçš„æ—¥å†
 */
 using namespace std;
 unsigned long int LunarInfo[]=
@@ -37,34 +38,34 @@ unsigned long int LunarInfo[]=
 class Date {
 public:
     Date() {
-        TotalDays = 0;
-        TotalMonths = 0;
-        TotalYears = 0;
+//        TotalDays = 0;
+//        TotalMonths = 0;
+//        TotalYears = 0;
         system("cls");
-        cout << "»¶Ó­Ê¹ÓÃ" << endl;
+        cout << "æ¬¢è¿ä½¿ç”¨" << endl;
     }
-    void InputTime();       //ÊäÈëÊ±¼ä
-    void GetNowTime();      //»ñÈ¡ÏµÍ³Ê±¼ä
-    void GetFirstDays();    //¼ÆËãµ±Ç°ÔÂ·İµÚÒ»ÌìÖÜ¼¸
-    void GetMonthDays();    //¼ÆËãµ±Ç°ÔÂ·İ×ÜÌìÊı
-    void Print();           //´òÓ¡µ±Ç°ÔÂ·İÈÕÀú
-    void PrintNowTime();    //´òÓ¡µ±Ç°Ê±¼ä
-    int intTransform(string str);     //½«ÊäÈëµÄ×Ö·û´®¸Ä±äÎªÕûÊı
+    void InputTime();       //è¾“å…¥æ—¶é—´
+    void GetNowTime();      //è·å–ç³»ç»Ÿæ—¶é—´
+    void GetFirstDays();    //è®¡ç®—å½“å‰æœˆä»½ç¬¬ä¸€å¤©å‘¨å‡ 
+    void GetMonthDays();    //è®¡ç®—å½“å‰æœˆä»½æ€»å¤©æ•°
+    void Print();           //æ‰“å°å½“å‰æœˆä»½æ—¥å†
+    void PrintNowTime();    //æ‰“å°å½“å‰æ—¶é—´
+    void Constellation();   //æ˜Ÿåº§åˆ¤æ–­
+    int intTransform(string str);     //å°†è¾“å…¥çš„å­—ç¬¦ä¸²æ”¹å˜ä¸ºæ•´æ•°
     ~Date() {
         cout << "thanks to use" << endl;
     }
 private:
     ISALLOW_COPY_AND_ASSIGN(Date);
-    int NowYear;
-    int NowMonth;
-    int NowDay;
-    int Year;
-    int Month;
-    int Day;
-    int TotalYears;
-    int TotalMonths;
-    int TotalDays;
-    int MonthDays;//Õâ¸öÔÂµÄÌìÊı
-    int FirstWeakDay;//Ã¿¸öÔÂµÚÒ»ÌìÖÜ¼¸
+    int NowYear;//å½“å‰å¹´
+    int NowMonth;//å½“å‰æœˆ
+    int NowDay;//å½“å‰æ—¥
+    int Year;//æŸ¥è¯¢å¹´
+    int Month;//æŸ¥è¯¢æœˆ
+    int Day;//æŸ¥è¯¢æ—¥
+    int MonthDays;//è¿™ä¸ªæœˆçš„å¤©æ•°
+    int FirstWeakDay;//æ¯ä¸ªæœˆç¬¬ä¸€å¤©å‘¨å‡ 
+    string ConstellationDescribe;//æ˜Ÿåº§æè¿°
 };
-#endif //WANNIANLI_DATE_H
+
+#endif // DATE_H_INCLUDED
