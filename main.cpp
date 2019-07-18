@@ -1,17 +1,23 @@
+//
+// Created by yyh on 2019/7/17.
+//
 #include <iostream>
 #include <iomanip>
-#include "cmake-build-debug/Date.h"
+#include<time.h>
+#include<stdlib.h>
+//
+#include "Date.h"
 
 using namespace std;
 
 void Date::InputTime() {
     string cYear, cMonth;
     int year = 0, month = 0;
-    cout << "²éÕÒÄê·İ ÔÂ·İ:";
-    bool cinFlag=true,valFlag=true;//cinFlagÓÃÓÚÅĞ¶ÏÊäÈëÊÇ·ñºÏ·¨£¬valFlagÅĞ¶ÏÔÂ·İºÍÄê·İÊÇ·ñºÏ·¨
+    cout << "æŸ¥æ‰¾å¹´ä»½ æœˆä»½:";
+    bool cinFlag=true,valFlag=true;//cinFlagç”¨äºåˆ¤æ–­è¾“å…¥æ˜¯å¦åˆæ³•ï¼ŒvalFlagåˆ¤æ–­æœˆä»½å’Œå¹´ä»½æ˜¯å¦åˆæ³•
     cin >> cYear >> cMonth;
     cin.good();
-    //Òì³£ÊäÈë´¦Àí
+    //å¼‚å¸¸è¾“å…¥å¤„ç†
     for (int i = 0; i < cYear.size(); i++) {
         if (cYear[i] > '9' || cYear[i] < '0') cinFlag = false;
     }
@@ -20,15 +26,16 @@ void Date::InputTime() {
     }
     if(cinFlag){
 //        cout<<"cYear="<<cYear<<' '<<"cMonth="<<cMonth<<endl;
+        //å¹´ä»½æœˆä»½è½¬æ¢ä¸ºæ•´å‹
         year=intTransform(cYear);
         month=intTransform(cMonth);
-        //Òì³£ÔÂ·İÊıÄê·İÊı´¦Àí
+        //å¼‚å¸¸æœˆä»½æ•°å¹´ä»½æ•°å¤„ç†
         if(year<0||month>13||month<0){
             cout<<"value error"<<endl;
             return;
         }
     }
-    else{//ÊäÈëÓĞÎó
+    else{//è¾“å…¥æœ‰è¯¯
         cout<<"cin error"<<endl;
         return;
     }
@@ -51,35 +58,89 @@ void Date::GetNowTime() {
     NowDay = LocalTime.tm_mday;
 }
 void Date::GetFirstDays() {
-/*    »ùÄ·À­¶ûÉ­¼ÆËã¹«Ê½
+/*    åŸºå§†æ‹‰å°”æ£®è®¡ç®—å…¬å¼
     W = (d + 2 * m + 3 * (m + 1) / 5 + y + y / 4 - y / 100 + y / 400) mod 7*/
     int month = Month, year = Year, day = 1;
     if (month == 1 || month == 2) {
         month += 12;
         year--;
     }
-    //¼ÆËã½á¹û ÖÜÈÕÎª0£¬ÖÜÒ»Îª1£¬ÒÔ´ËÀàÍÆ
+    //è®¡ç®—ç»“æœ å‘¨æ—¥ä¸º0ï¼Œå‘¨ä¸€ä¸º1ï¼Œä»¥æ­¤ç±»æ¨
     FirstWeakDay = (day + 2 * month + 3 * (month + 1) / 5 + year + year / 4 - year / 100 + year / 400) % 7 + 1;
     if (FirstWeakDay == 7) FirstWeakDay = 0;
 }
 void Date::GetMonthDays() {
-    int day[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};//Ã¿ÔÂÌìÊı
-    if ((Year % 4 == 0 && Year % 100 != 0) || (Year % 400 == 0))//ÈòÄêÅĞ¶Ï
+    int day[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};//æ¯æœˆå¤©æ•°
+    if ((Year % 4 == 0 && Year % 100 != 0) || (Year % 400 == 0))//é—°å¹´åˆ¤æ–­
         day[1]++;
-    MonthDays = day[Month - 1];//ÇóµÃÔÂ·İµÄÌìÊı
+    MonthDays = day[Month - 1];//æ±‚å¾—æœˆä»½çš„å¤©æ•°
+}
+void Date::Constellation(){
+//    cout<<"Constellation is run"<<endl;
+    string ConsteList[12]={"ç™½ç¾Šåº§","é‡‘ç‰›åº§","åŒå­åº§","å·¨èŸ¹åº§","ç‹®å­åº§","å¤„å¥³åº§","å¤©ç§¤åº§","å¤©èåº§","å°„æ‰‹åº§","æ‘©ç¾¯åº§","æ°´ç“¶åº§","åŒé±¼åº§"};
+    if(Month==3){
+        if(Day>=21) ConstellationDescribe=ConsteList[0];
+        else ConstellationDescribe=ConsteList[11];
+    }
+    if(Month==4){
+        if(Day>=21) ConstellationDescribe=ConsteList[1];
+        else ConstellationDescribe=ConsteList[0];
+    }
+    if(Month==5){
+        if(Day>=21) ConstellationDescribe=ConsteList[2];
+        else ConstellationDescribe=ConsteList[1];
+    }
+    if(Month==6){
+        if(Day>=22) ConstellationDescribe=ConsteList[3];
+        else ConstellationDescribe=ConsteList[2];
+    }
+    if(Month==7){
+        if(Day>=23) ConstellationDescribe=ConsteList[4];
+        else ConstellationDescribe=ConsteList[3];
+    }
+    if(Month==8){
+        if(Day>=23) ConstellationDescribe=ConsteList[5];
+        else ConstellationDescribe=ConsteList[4];
+    }
+    if(Month==9){
+        if(Day>=23) ConstellationDescribe=ConsteList[6];
+        else ConstellationDescribe=ConsteList[7];
+    }
+    if(Month==10){
+        if(Day>=23) ConstellationDescribe=ConsteList[7];
+        else ConstellationDescribe=ConsteList[8];
+    }
+    if(Month==11){
+        if(Day>=22) ConstellationDescribe=ConsteList[8];
+        else ConstellationDescribe=ConsteList[7];
+    }
+    if(Month==12){
+        if(Day>=22) ConstellationDescribe=ConsteList[9];
+        else ConstellationDescribe=ConsteList[8];
+    }
+    if(Month==1){
+        if(Day>=20) ConstellationDescribe=ConsteList[10];
+        else ConstellationDescribe=ConsteList[9];
+    }
+    if(Month==2){
+        if(Day>=19) ConstellationDescribe=ConsteList[11];
+        else ConstellationDescribe=ConsteList[10];
+    }
 }
 void Date::Print() {
-    GetMonthDays();                 //»ñÈ¡µ±Ç°ÔÂ·İÌìÊı
-    GetFirstDays();                 //»ñÈ¡µÚÒ»ÌìÖÜ¼¸
+    GetMonthDays();                 //è·å–å½“å‰æœˆä»½å¤©æ•°
+    GetFirstDays();                 //è·å–ç¬¬ä¸€å¤©å‘¨å‡ 
+    Constellation();                //è·å–æ˜Ÿåº§
     //system("cls");
-    cout << "Now the time is:" << NowYear << '.' << NowMonth << '.' << NowDay << endl;
+    cout <<"Constellation:"<<ConstellationDescribe<<endl;
     cout << "You find time is:" << Year << '.' << Month << endl;
-    cout << "ÈÕ Ò» ¶ş Èı ËÄ Îå Áù" << endl;
+    //cout<<"firstday:"<<FirstWeakDay<<endl;
+    cout << "æ—¥ ä¸€ äºŒ ä¸‰ å›› äº” å…­" << endl;
     if (FirstWeakDay<7)
         for (int i = 0; i < FirstWeakDay; i++)
             cout << "   ";
     for (int i = 1; i <= MonthDays; i++) {
-        if ((FirstWeakDay + i - 1) % 7 == 0) {
+        if ((FirstWeakDay + i - 1) % 7 == 0&&(FirstWeakDay + i - 1)!=0) {//å½“ç¬¬ä¸€å¤©å°±æ˜¯å‘¨æ—¥çš„æ—¶å€™ä¸è¦è¾“å‡ºæ¢è¡Œ
             cout << endl;
         }
         cout << setw(3) << left << i;
@@ -92,13 +153,14 @@ void Date::PrintNowTime() {
     Month = NowMonth;
     Day = NowDay;
     system("cls");
+    cout << "Now the time is:" << NowYear << '.' << NowMonth << '.' << NowDay << endl;
     //cout<<"Now the time is:"<<Year<<'.'<<Month<<'.'<<Day<<endl;
     GetMonthDays();
     GetFirstDays();
     Print();
 }
 int main() {
-    bool flag = true;//ÅĞ¶ÏÊÇ·ñÒì³£ÍË³ö
+    bool flag = true;//åˆ¤æ–­æ˜¯å¦å¼‚å¸¸é€€å‡º
     while (flag) {
         Date cal;
         cal.PrintNowTime();
