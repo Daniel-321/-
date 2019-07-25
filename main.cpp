@@ -1,14 +1,15 @@
 //
 //  Created by yyh on 2019/7/17.
 //  东北大学 物联网1802 c++课程设计
-//
+//7.23-支持显示1900-2050年农历及所有年份星座-更新了干支纪年法输出
+//7.25-新增了二十四节气的输出
 #include <iostream>
 #include <iomanip>
 #include<time.h>
 #include<stdlib.h>
 //
 //#include "Date.h"
-#include "cmake-build-debug/Date.h"
+#include "Date.h"
 #include "Data.h"
 using namespace std;
 
@@ -31,7 +32,7 @@ void Date::InputTime() {
         //转化为int类型
         year=intTransform(cYear);
         month=intTransform(cMonth);
-        //??????????
+        //值判断
         if(year<0||month>13||month<0){
             cout<<"value error"<<endl;
             return;
@@ -73,10 +74,10 @@ void Date::GetFirstDays() {
     if (FirstWeakDay == 7) FirstWeakDay = 0;
 }
 void Date::GetMonthDays() {
-    int day[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};//月份天数表
+    int Month2=0;
     if ((Year % 4 == 0 && Year % 100 != 0) || (Year % 400 == 0))//闰年判断
-        day[1]++;
-    MonthDays = day[Month - 1];//每个月天数
+        Month2++;
+    MonthDays = MonthList[Month - 1]+Month2;//每个月天数
 }
 void Date::Constellation(){
 //    cout<<"Constellation is run"<<endl;
@@ -130,18 +131,54 @@ void Date::Constellation(){
         else ConstellationDescribe=ConsteList[10];
     }
 }
-void Date::Print() {
+void Date::SimplePrint(){
     GetMonthDays();                 //得到每个月天数
     GetFirstDays();                 //得到第一天周几
     Constellation();                //得到星座
     //system("cls");
-
+    cout <<"星座:"<<ConstellationDescribe<<endl;
+    cout << "You find time is:" << Year << '.' << Month<<'.' <<Day<< endl;
+    cout<<"抱歉，本年份农历信息尚未收录"<<endl;
+    cout<<"您可以查看阳历、星座、星期等信息"<<endl;
+    //cout<<"firstday:"<<FirstWeakDay<<endl;
+    cout << "星期日 星期一 星期二 星期三 星期四 星期五 星期六" << endl;
+    if (FirstWeakDay<7)
+        for (int i = 0; i < FirstWeakDay; i++)
+            cout << "       ";
+    for (int i = 1; i <= MonthDays; i++) {//一个公历月的循环
+        if ((FirstWeakDay + i - 1) % 7 == 0 && (FirstWeakDay + i - 1) != 0) {//第一天是周日不需要换行
+            cout << endl;
+        }
+        cout << setw(7) << left << i;
+    }
+    cout << endl;
+}
+void Date::AllPrint() {
+    GetMonthDays();                 //得到每个月天数
+    if(Day>MonthDays||Day<=0) {
+        cout<<"日期超过当月天数或非法，默认设定为最后一天"<<endl;
+        Day=MonthDays;
+    }
+    GetFirstDays();                 //得到第一天周几
+    Constellation();                //得到星座
+    if(Year<=1900||Year>2100)       //如果农历表中没有这一年
+    {
+        SimplePrint();
+    }
+    Lunar(Year,Month,Day);          //得到农历日期
+    //system("cls");
     int LineFlagBegin=1,LineFlagEnd=30;//每一行开始/结束的标志
     int loopflag=0;//标志第一次进入农历的输出循环
-    cout <<"Constellation:"<<ConstellationDescribe<<endl;
+    cout <<"星座:"<<ConstellationDescribe<<endl;
     cout << "You find time is:" << Year << '.' << Month<<'.' <<Day<< endl;
     output(Year,Month,Day);
+    //test:
     //cout<<"firstday:"<<FirstWeakDay<<endl;
+    int HoliFlag=GetLunarHolDay(Year,Month,Day);//标志今日是否有节气
+    if(HoliFlag){//只要返回值不为零，输出今日节气
+        cout<<"今日是："<<LanarHoliDay[HoliFlag]<<endl;
+    }
+
     cout << "星期日 星期一 星期二 星期三 星期四 星期五 星期六" << endl;
     if (FirstWeakDay<7)
         for (int i = 0; i < FirstWeakDay; i++)
@@ -195,10 +232,11 @@ void Date::PrintNowTime() {
     //cout<<"Now the time is:"<<Year<<'.'<<Month<<'.'<<Day<<endl;
     GetMonthDays();
     GetFirstDays();
-    Print();
+    if(Year<=1900||Year>2100)       //如果农历表中没有这一年
+        SimplePrint();
+    AllPrint();
 }
-int Date::Lunar(int year, int month, int day)
-{
+int Date::Lunar(int year, int month, int day){//计算农历日期
     int SpanSpring,SpanDays,DayCount;
     int index,LeapFlag;
     //SpanSpring 记录春节离当年元旦的天数。
@@ -283,6 +321,8 @@ int Date::Lunar(int year, int month, int day)
     LunarCalendarDay=0;//一定要初始化！！！！否则之后的运算会带着非0值走下去 导致数组越界
     LunarCalendarDay |= day;//LunarCalendarDay用于存储农历日和月，低5位存日期，6位开始存月份
     LunarCalendarDay |= (month << 6);//6位开始存月份
+    //至此 我们已经能够求出农历年月日
+    LunarYear=year;
     LunarMonth=(LunarCalendarDay & 0x3C0) >> 6;
     LunarDay=LunarCalendarDay & 0x3F;
     if (month == ((LunarTable[year - 1901] & 0xF00000) >> 20))
@@ -290,10 +330,27 @@ int Date::Lunar(int year, int month, int day)
     else
         return 0;
 }
+void Date::CalculateYearGanZhi() {
+    //知道某一年的天干地支，就可以计算出其它年份的天干地支，具体算法如下
+    int SpanYear=LunarYear-2000;//我们知道2000年是庚辰龙年，以此为基准
+    int gan=(7+SpanYear)%10-1;//天干中庚排第七位，共有10个天干
+    int zhi=(5+SpanYear)%12-1;//地支中辰排第五位，共有12个地支
+    //当年份小于2000会有负数出现，为防止下标越界，如下处理
+    if(gan<0)
+        gan+=10;
+    if(zhi<0)
+        zhi+=12;
+    //对应下标，转化为字符串
+    TianGanDescribe=TianGan[gan];
+    DiZhiDescribe=DiZhi[zhi];
+    ShengXiaoDescribe=ShengXiao[zhi];
+    JiNianDescribe=TianGanDescribe+DiZhiDescribe+ShengXiaoDescribe+"年";
+}
 void Date::output(int year,int month,int day)
 {
+    CalculateYearGanZhi();          //得到干支描述
+    cout<<"农历"<<JiNianDescribe<<endl;
     string str = "";
-    str+="农历";
     if (Lunar(year,month,day))//闰月判断
         str+="闰";
     Lunar(year,month,day);
@@ -306,13 +363,32 @@ void Date::output(int year,int month,int day)
     //0x3F=0011 1111
     cout<<str<<endl;
 }
+int Date::GetLunarHolDay(int year, int month, int day) {
+    unsigned int flag=gLunarHolDay[year-1901][month-1];//得到这一年这个月的节气信息
+    int holiday=0;
+    //cout<<"hex:"<<hex<<a<<endl;hex可以输出一个整数的16进制，用于调试
+    if(day<15){//当日期在前半个月 对应第一个节气
+        flag>>=4;//右移四位取出第一个节气的信息
+        flag&=0x0f;
+        holiday=15-flag;
+        //cout<<"hex:"<<hex<<flag<<endl;
+    }
+    if(day>=15){//当日期在后半个月 对应第二个节气
+        flag&=0x0f;
+        holiday=flag+15;
+        //cout<<"hex:"<<hex<<flag<<endl;
+    }
+    if(holiday==Day){//当前日恰好存在节气
+        return (Month-1)*2+(Day>=15?1:0);
+    }
+}
 int main() {
-    bool flag = true;//????????
+    bool flag = true;
     while (flag) {
         Date cal;
         cal.PrintNowTime();
         cal.InputTime();
-        cal.Print();
+        cal.AllPrint();
         system("pause");
     }
     return 0;
