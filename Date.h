@@ -29,12 +29,15 @@ public:
     void GetNowTime();      //获取系统时间
     void GetFirstDays();    //计算当前月份第一天周几
     void GetMonthDays();    //计算当前月份总天数
-    void Print();           //打印当前月份日历
+    void AllPrint();           //打印当前月份日历
+    void SimplePrint();     //仅打印阳历
     void PrintNowTime();    //打印当前时间
+    void CalculateYearGanZhi();//打印天干地支
     void LunarPrint(int LineFlagBegin,int LineFlagEnd);      //打印农历
     void Constellation();   //星座判断
     int Lunar(int year, int month, int day);        //农历
     void output(int year, int month, int day);      //农历输出
+    int GetLunarHolDay(int year,int month,int day); //得到节气
     int intTransform(string str);     //将输入的字符串改变为整数
     ~Date() {
         cout << "thanks to use" << endl;
@@ -54,8 +57,13 @@ private:
     int MonthDays;//这个月的天数
     int FirstWeakDay;//每个月第一天周几
     string ConstellationDescribe;//星座描述
-
+    string TianGanDescribe;//天干描述
+    string DiZhiDescribe;//地支描述
+    string ShengXiaoDescribe;//生肖描述
+    string JiNianDescribe;//纪年法描述
+};
+class LunarDate:public Date{//等待继承，农历类
+private:
 
 };
-
 #endif // DATE_H_INCLUDED
